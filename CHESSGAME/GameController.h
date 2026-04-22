@@ -13,6 +13,8 @@ private:
     PieceMovement mv;
     MinMax minmax;
     GameState gs; 
+    
+    int option_ = 0;
 
     bool hasAnyLegalMove(bool white) {
         for (int fr = 0; fr < 8; fr++) {
@@ -51,42 +53,46 @@ private:
 public:
     
     void Move_mal() {
+        std::cout << "pvp = 1" << "\n" << "pve = 0" << "\n";
+        std::cout << ": ";
+        std::cin >> option_;
         while (true) {
             cb.printBoard();
-            
-            // 흑을 AI로 설정
-            if (!gs.whiteTurn) {
-                auto moves = minmax.getGenerateMoves(cb, gs, false);
-                if (moves.empty()) {
-                    cb.printBoard();
-                    if (mv.inCheck(cb, false)) cout << "black Checkmate! Game over\n";
-                    else cout << "Stalemate! It's a draw\n";
-                    break;
-                }
 
-                auto [fr, fc, tr, tc] = minmax.getBestMove(cb, gs, false);
-                cb.makeMove(fr, fc, tr, tc);
-                gs.whiteTurn = true;
-
-                if (mv.inCheck(cb, true)) {
-                    auto whiteMoves = minmax.getGenerateMoves(cb, gs, true);
-                    if (whiteMoves.empty()) {
+            if (option_ == 0) {
+                // 흑을 AI로 설정
+                if (!gs.whiteTurn) {
+                    auto moves = minmax.getGenerateMoves(cb, gs, false);
+                    if (moves.empty()) {
                         cb.printBoard();
-                        cout << "white Checkmate! Game over\n";
+                        if (mv.inCheck(cb, false)) cout << "black Checkmate! Game over\n";
+                        else cout << "Stalemate! It's a draw\n";
                         break;
                     }
-                    cout << "white check!\n";
-                } else {
-                    auto whiteMoves = minmax.getGenerateMoves(cb, gs, true);
-                    if (whiteMoves.empty()) {
-                        cb.printBoard();
-                        cout << "Stalemate! It's a draw\n";
-                        break;
+    
+                    auto [fr, fc, tr, tc] = minmax.getBestMove(cb, gs, false);
+                    cb.makeMove(fr, fc, tr, tc);
+                    gs.whiteTurn = true;
+    
+                    if (mv.inCheck(cb, true)) {
+                        auto whiteMoves = minmax.getGenerateMoves(cb, gs, true);
+                        if (whiteMoves.empty()) {
+                            cb.printBoard();
+                            cout << "white Checkmate! Game over\n";
+                            break;
+                        }
+                        cout << "white check!\n";
+                    } else {
+                        auto whiteMoves = minmax.getGenerateMoves(cb, gs, true);
+                        if (whiteMoves.empty()) {
+                            cb.printBoard();
+                            cout << "Stalemate! It's a draw\n";
+                            break;
+                        }
                     }
+                    continue;
                 }
-                continue;
-            }
-            
+            }    
             // 변경 후 (a1 b3 형식)
             cout << (gs.whiteTurn ? "white" : "black") << " turn. (ex: e2 e4): ";
             string from, to;
