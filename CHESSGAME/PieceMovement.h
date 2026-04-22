@@ -1,12 +1,10 @@
 ﻿// PieceMovement.h — 이동 규칙, 체크, 캐슬링 판단
 #pragma once
 #include "ChessBoard.h"
-#include "minmax.h"
 #include <cmath>
 
 class PieceMovement {
 public:
-    class minmax nx;
     
     bool isPathClear(const ChessBoard& cb, int fr, int fc, int tr, int tc) const {
         int dr = (tr>fr)?1:(tr<fr)?-1:0;

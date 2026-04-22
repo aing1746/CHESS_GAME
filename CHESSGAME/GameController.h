@@ -2,7 +2,7 @@
 #pragma once
 #include "ChessBoard.h"
 #include "PieceMovement.h"
-// #include "minmax.h"
+#include "minmax.h"
 #include "GameState.h"
 #include <string>
 
@@ -11,6 +11,7 @@ class GameController {
 private:
     ChessBoard cb;
     PieceMovement mv;
+    MinMax minmax;
     GameState gs; 
 
     bool hasAnyLegalMove(bool white) {
@@ -52,6 +53,28 @@ public:
     void Move_mal() {
         while (true) {
             cb.printBoard();
+            
+            // 흑을 AI로 설정
+            if (!gs.whiteTurn) {
+                auto [fr, fc, tr, tc] = minmax.getBestMove(cb, gs, false);
+                cb.makeMove(fr, fc, tr, tc);
+                gs.whiteTurn = true;
+
+                if (mv.inCheck(cb, gs.whiteTurn)) {
+                    if (!hasAnyLegalMove(gs.whiteTurn)) {
+                        cb.printBoard();
+                        cout << "white Checkmate! Game over\n";
+                        break;
+                    }
+                    cout << "white check!\n";
+                } else if (!hasAnyLegalMove(gs.whiteTurn)) {
+                    cb.printBoard();
+                    cout << "Stalemate! It's a draw\n";
+                    break;
+                }
+                continue;
+            }
+            
             // 변경 후 (a1 b3 형식)
             cout << (gs.whiteTurn ? "white" : "black") << " turn. (ex: e2 e4): ";
             string from, to;
