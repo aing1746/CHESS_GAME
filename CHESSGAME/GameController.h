@@ -11,7 +11,7 @@ class GameController {
 private:
     ChessBoard cb;
     PieceMovement mv;
-    MinMax minmax;
+    MinMax mn;
     GameState gs; 
     
     int option_ = 0;
@@ -62,7 +62,7 @@ public:
             if (option_ == 0) {
                 // 흑을 AI로 설정
                 if (!gs.whiteTurn) {
-                    auto moves = minmax.getGenerateMoves(cb, gs, false);
+                    auto moves = mn.getGenerateMoves(cb, gs, false);
                     if (moves.empty()) {
                         cb.printBoard();
                         if (mv.inCheck(cb, false)) cout << "black Checkmate! Game over\n";
@@ -70,12 +70,12 @@ public:
                         break;
                     }
     
-                    auto [fr, fc, tr, tc] = minmax.getBestMove(cb, gs, false);
+                    auto [fr, fc, tr, tc] = mn.getBestMove(cb, gs, false);
                     cb.makeMove(fr, fc, tr, tc);
                     gs.whiteTurn = true;
     
                     if (mv.inCheck(cb, true)) {
-                        auto whiteMoves = minmax.getGenerateMoves(cb, gs, true);
+                        auto whiteMoves = mn.getGenerateMoves(cb, gs, true);
                         if (whiteMoves.empty()) {
                             cb.printBoard();
                             cout << "white Checkmate! Game over\n";
@@ -83,7 +83,7 @@ public:
                         }
                         cout << "white check!\n";
                     } else {
-                        auto whiteMoves = minmax.getGenerateMoves(cb, gs, true);
+                        auto whiteMoves = mn.getGenerateMoves(cb, gs, true);
                         if (whiteMoves.empty()) {
                             cb.printBoard();
                             cout << "Stalemate! It's a draw\n";
