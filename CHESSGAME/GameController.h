@@ -19,15 +19,15 @@ private:
     bool hasAnyLegalMove(bool white) {
         for (int fr = 0; fr < 8; fr++) {
             for (int fc = 0; fc < 8; fc++) {
-                string p = cb.board[fr][fc];
+                std::string p = cb.board[fr][fc];
                 if (p == ".") continue;
                 if (white && !isupper(p[0])) continue;
                 if (!white && isupper(p[0])) continue;
                 for (int tr = 0; tr < 8; tr++) {
                     for (int tc = 0; tc < 8; tc++) {
                         if (cb.isSameTeam(p, cb.board[tr][tc])) continue;
-                        string saveFrom = cb.board[fr][fc];
-                        string saveTo   = cb.board[tr][tc];
+                        std::string saveFrom = cb.board[fr][fc];
+                        std::string saveTo   = cb.board[tr][tc];
                         cb.board[tr][tc] = p;
                         cb.board[fr][fc] = ".";
                         bool safe = !mv.inCheck(cb, white);
@@ -41,7 +41,7 @@ private:
         return false;
     }
 
-    void updateCastleFlags(const string& piece, int fr, int fc) {
+    void updateCastleFlags(const std::string& piece, int fr, int fc) {
         if (piece == "K") gs.whiteKingMoved = true;
         if (piece == "k") gs.blackKingMoved = true;
         if (piece == "R" && fc == 0) gs.whiteRookMoved[0] = true;
@@ -65,8 +65,8 @@ public:
                     auto moves = mn.getGenerateMoves(cb, gs, false);
                     if (moves.empty()) {
                         cb.printBoard();
-                        if (mv.inCheck(cb, false)) cout << "black Checkmate! Game over\n";
-                        else cout << "Stalemate! It's a draw\n";
+                        if (mv.inCheck(cb, false)) std::cout << "black Checkmate! Game over\n";
+                        else std::cout << "Stalemate! It's a draw\n";
                         break;
                     }
     
@@ -78,15 +78,15 @@ public:
                         auto whiteMoves = mn.getGenerateMoves(cb, gs, true);
                         if (whiteMoves.empty()) {
                             cb.printBoard();
-                            cout << "white Checkmate! Game over\n";
+                            std::cout << "white Checkmate! Game over\n";
                             break;
                         }
-                        cout << "white check!\n";
+                        std::cout << "white check!\n";
                     } else {
                         auto whiteMoves = mn.getGenerateMoves(cb, gs, true);
                         if (whiteMoves.empty()) {
                             cb.printBoard();
-                            cout << "Stalemate! It's a draw\n";
+                            std::cout << "Stalemate! It's a draw\n";
                             break;
                         }
                     }
@@ -94,24 +94,24 @@ public:
                 }
             }    
             // 변경 후 (a1 b3 형식)
-            cout << (gs.whiteTurn ? "white" : "black") << " turn. (ex: e2 e4): ";
-            string from, to;
-            if (!(cin >> from >> to)) { cout << "Input error. Shutdown\n"; break; }
+            std::cout << (gs.whiteTurn ? "white" : "black") << " turn. (ex: e2 e4): ";
+            std::string from, to;
+            if (!(std::cin >> from >> to)) { std::cout << "Input error. Shutdown\n"; break; }
 
             // 입력 유효성 검사
             if (from.size() != 2 || to.size() != 2 ||
                 from[0] < 'a' || from[0] > 'h' || from[1] < '1' || from[1] > '8' ||
                 to[0]   < 'a' || to[0]   > 'h' || to[1]   < '1' || to[1]   > '8') {
-                cout << "wrong enter. (ex: e2 e4)\n"; continue;
+                std::cout << "wrong enter. (ex: e2 e4)\n"; continue;
                 }
 
             int fc = from[0] - 'a';
             int fr = from[1] - '1';
             int tc = to[0]   - 'a';
             int tr = to[1]   - '1';
-            string piece = cb.board[fr][fc];
+            std::string piece = cb.board[fr][fc];
             if (piece == "." || (gs.whiteTurn && !isupper(piece[0])) || (!gs.whiteTurn && isupper(piece[0]))) {
-                cout << "Invalid property selection\n"; continue;
+                std::cout << "Invalid property selection\n"; continue;
             }
 
             // 캐슬링
@@ -127,12 +127,12 @@ public:
                     gs.whiteTurn = !gs.whiteTurn;
                     continue;
                 }
-                cout << "Can't castling\n"; continue;
+                std::cout << "Can't castling\n"; continue;
             }
 
             if (!mv.isLegalMove(cb, piece, fr, fc, tr, tc,
                                 gs.lastMoveWasDoublePawn, gs.lastPawnRow, gs.lastPawnCol)) {
-                cout << "Invalid movement\n"; continue;
+                std::cout << "Invalid movement\n"; continue;
             }
 
             // 앙파상 처리
@@ -145,12 +145,12 @@ public:
 
             // 캐슬링 플래그 업데이트 후 이동
             updateCastleFlags(piece, fr, fc);
-            string savedFrom = cb.board[fr][fc], savedTo = cb.board[tr][tc];
+            std::string savedFrom = cb.board[fr][fc], savedTo = cb.board[tr][tc];
             cb.makeMove(fr, fc, tr, tc);
 
             if (mv.inCheck(cb, gs.whiteTurn)) {
                 cb.board[fr][fc] = savedFrom; cb.board[tr][tc] = savedTo;
-                cout << "Illegal: puts own king in check\n";
+                std::cout << "Illegal: puts own king in check\n";
                 continue;
             }
 
@@ -160,13 +160,13 @@ public:
             if (mv.inCheck(cb, gs.whiteTurn)) {
                 if (!hasAnyLegalMove(gs.whiteTurn)) {
                     cb.printBoard();
-                    cout << (gs.whiteTurn ? "white" : "black") << " Checkmate! Game over\n";
+                    std::cout << (gs.whiteTurn ? "white" : "black") << " Checkmate! Game over\n";
                     break;
                 }
-                cout << (gs.whiteTurn ? "white" : "black") << " check!\n";
+                std::cout << (gs.whiteTurn ? "white" : "black") << " check!\n";
             } else if (!hasAnyLegalMove(gs.whiteTurn)) {
                 cb.printBoard();
-                cout << "Stalemate! It's a draw\n";
+                std::cout << "Stalemate! It's a draw\n";
                 break;
             }
         }
